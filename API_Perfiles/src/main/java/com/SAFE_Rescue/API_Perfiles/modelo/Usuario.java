@@ -15,7 +15,7 @@ import java.util.Date;
  * Contiene información sobre la composición y estado del usuario.
  */
 @Entity
-@Table(name = "usuarios")
+@Table(name = "usuario")
 @NoArgsConstructor
 @AllArgsConstructor
 @Data

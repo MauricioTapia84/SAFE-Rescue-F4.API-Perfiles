@@ -12,8 +12,8 @@ import lombok.NoArgsConstructor;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
 @PrimaryKeyJoinColumn(name = "id_usuario")
+@Data
 public class Bombero extends Usuario {
 
     /**
