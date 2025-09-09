@@ -6,16 +6,11 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * Entidad que representa un estado en el sistema.
- * Contiene información sobre la composición y estado del estado
- */
 @Entity
 @Table(name = "estado")
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-@Schema(description = "Entidad que representa un estado")
 public class Estado {
 
     @Id
@@ -24,12 +19,11 @@ public class Estado {
     @Schema(description = "Identificador único del estado", example = "1")
     private int idEstado;
 
-    /**
-     * Nombre del Estado
-     * Debe ser un valor no nulo y con una longitud máxima recomendada de 50 caracteres
-     */
-    @Schema(description = "Nombre del tipo de equipo", example = "Baneado")
-    @Column(length = 50, nullable = false)
+    @Column(name = "nombre", unique = true, length = 50, nullable = false)
+    @Schema(description = "Nombre del estado", example = "Activo")
     private String nombre;
 
+    @Column(name = "descripcion", length = 100, nullable = true)
+    @Schema(description = "Descripción del estado", example = "El usuario está activo en el sistema.")
+    private String descripcion;
 }

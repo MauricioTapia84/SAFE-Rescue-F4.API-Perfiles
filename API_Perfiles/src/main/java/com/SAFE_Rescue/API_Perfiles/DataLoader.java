@@ -8,74 +8,67 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 
-/**
- * Clase encargada de cargar datos iniciales en la base de datos para el perfil de desarrollo.
- * Esta clase se ejecuta solo en el perfil 'dev' y utiliza Faker para generar datos ficticios.
- * Usa WebClient para obtener datos de APIs externas (Compania y Estado).
- */
 @Profile("dev")
 @Component
 public class DataLoader implements CommandLineRunner {
 
-    @Autowired
-    private UsuarioRepository usuarioRepository;
-    @Autowired
-    private BomberoRepository bomberoRepository;
-    @Autowired
-    private TipoUsuarioRepository tipoUsuarioRepository;
-    @Autowired
-    private TipoEquipoRepository tipoEquipoRepository;
-    @Autowired
-    private EquipoRepository equipoRepository;
-    @Autowired
-    private WebClient estadoWebClient;
-    @Autowired
-    private WebClient companiaWebClient;
+    // Repositorios y WebClients inyectados
+    @Autowired private UsuarioRepository usuarioRepository;
+    @Autowired private BomberoRepository bomberoRepository;
+    @Autowired private TipoUsuarioRepository tipoUsuarioRepository;
+    @Autowired private TipoEquipoRepository tipoEquipoRepository;
+    @Autowired private EquipoRepository equipoRepository;
+    @Autowired private WebClient estadoWebClient;
+    @Autowired private WebClient companiaWebClient;
 
     private final Faker faker = new Faker(new Locale("es"));
     private final Set<String> uniqueRuns = new HashSet<>();
     private final Set<String> uniqueTelefonos = new HashSet<>();
     private final Set<String> uniqueCorreos = new HashSet<>();
 
+    private static final String BOMBERO_TIPO = "Bombero en Terreno";
+    private static final String OPERADOR_TIPO = "Operador de Sala";
+
     @Override
-    public void run(String... args) throws Exception {
+    public void run(String... args) {
         System.out.println("Cargando datos de prueba...");
 
-        // Generar y obtener entidades de catálogo locales
-        List<TipoUsuario> tiposUsuario = crearTiposUsuario();
-        List<TipoEquipo> tiposEquipo = crearTiposEquipo();
+        try {
+            // Generar y obtener entidades de catálogo locales
+            List<TipoUsuario> tiposUsuario = crearTiposUsuario();
+            List<TipoEquipo> tiposEquipo = crearTiposEquipo();
 
-        if (tiposUsuario.isEmpty() || tiposEquipo.isEmpty()) {
-            System.err.println("Error: No se pudieron crear los tipos de usuario o tipos de equipo. Deteniendo carga.");
-            return;
+            // Obtener entidades de APIs externas
+            List<Estado> estados = obtenerEntidadesExternas(estadoWebClient, "/estados", Estado.class);
+            List<Compania> companias = obtenerEntidadesExternas(companiaWebClient, "/companias", Compania.class);
+
+            if (tiposUsuario.isEmpty() || tiposEquipo.isEmpty() || estados.isEmpty() || companias.isEmpty()) {
+                System.err.println("Error: No se pudieron obtener entidades de catálogo. Deteniendo la carga.");
+                return;
+            }
+
+            // Generar Equipos
+            List<Equipo> equipos = crearEquipos(tiposEquipo, companias, estados);
+
+            // Generar Usuarios y Bomberos
+            crearUsuarios(tiposUsuario, estados, equipos);
+
+            System.out.println("Carga de datos finalizada.");
+        } catch (Exception e) {
+            System.err.println("Un error inesperado ocurrió durante la carga de datos: " + e.getMessage());
+            e.printStackTrace();
         }
-
-        // Obtener entidades de APIs externas
-        List<Estado> estados = obtenerEntidadesExternas(estadoWebClient, "/estados", Estado.class);
-        List<Compania> companias = obtenerEntidadesExternas(companiaWebClient, "/companias", Compania.class);
-
-        if (estados.isEmpty() || companias.isEmpty()) {
-            System.err.println("Error: No se pudieron obtener estados o compañías de las APIs externas. Deteniendo carga.");
-            return;
-        }
-
-        // Generar Equipos
-        List<Equipo> equipos = crearEquipos(tiposEquipo, companias, estados);
-
-        // Generar Usuarios y Bomberos
-        crearUsuarios(tiposUsuario, estados, equipos);
-
-        System.out.println("Carga de datos finalizada.");
     }
 
     // Métodos para crear entidades locales
 
     private List<TipoUsuario> crearTiposUsuario() {
-        List<String> nombres = Arrays.asList("Jefe de Compañía", "Administrador", "Bombero en Terreno", "Operador de Sala", "Ciudadano");
+        List<String> nombres = Arrays.asList("Jefe de Compañía", BOMBERO_TIPO, OPERADOR_TIPO, "Administrador", "Ciudadano");
         List<TipoUsuario> tiposUsuario = new ArrayList<>();
         for (String nombre : nombres) {
             TipoUsuario tipo = new TipoUsuario();
@@ -118,80 +111,59 @@ public class DataLoader implements CommandLineRunner {
         for (TipoUsuario tipo : tiposUsuario) {
             int cantidad = 2; // Cantidad de usuarios por tipo
             for (int i = 0; i < cantidad; i++) {
-                // Se crea un usuario base con datos únicos
-                Usuario usuarioBase = crearUsuarioBase();
-                usuarioBase.setTipoUsuario(tipo);
-                usuarioBase.setEstado(estados.get(faker.random().nextInt(estados.size())));
-
-                // Lógica de asignación de equipo según el tipo de usuario
-                if (tipo.getNombre().equalsIgnoreCase("Bombero en Terreno") || tipo.getNombre().equalsIgnoreCase("Operador de Sala")) {
-                    Bombero bombero = new Bombero();
-                    // Copiar los atributos del usuario base al bombero
-                    bombero.setRun(usuarioBase.getRun());
-                    bombero.setDv(usuarioBase.getDv());
-                    bombero.setNombre(usuarioBase.getNombre());
-                    bombero.setAPaterno(usuarioBase.getAPaterno());
-                    bombero.setAMaterno(usuarioBase.getAMaterno());
-                    bombero.setFechaRegistro(usuarioBase.getFechaRegistro());
-                    bombero.setTelefono(usuarioBase.getTelefono());
-                    bombero.setCorreo(usuarioBase.getCorreo());
-                    bombero.setContrasenia(usuarioBase.getContrasenia());
-                    bombero.setIntentosFallidos(usuarioBase.getIntentosFallidos());
-                    bombero.setRazonBaneo(usuarioBase.getRazonBaneo());
-                    bombero.setDiasBaneo(usuarioBase.getDiasBaneo());
-                    bombero.setEstado(usuarioBase.getEstado());
-                    bombero.setTipoUsuario(tipo);
-
-                    // Asignar un equipo al bombero
-                    bombero.setEquipo(equipos.get(faker.random().nextInt(equipos.size())));
-                    bomberoRepository.save(bombero);
+                Usuario usuario;
+                if (tipo.getNombre().equalsIgnoreCase(BOMBERO_TIPO) || tipo.getNombre().equalsIgnoreCase(OPERADOR_TIPO)) {
+                    usuario = new Bombero();
+                    // Casting seguro para asignar el equipo
+                    ((Bombero) usuario).setEquipo(equipos.get(faker.random().nextInt(equipos.size())));
+                    bomberoRepository.save((Bombero) usuario);
                 } else {
-                    // Si no es un bombero en terreno u operador, se guarda como Usuario
-                    usuarioRepository.save(usuarioBase);
+                    usuario = new Usuario();
+                    usuarioRepository.save(usuario);
                 }
+
+                // Asignar los atributos base a la instancia recién creada (Usuario o Bombero)
+                usuario.setRun(crearRunUnico());
+                usuario.setDv(calcularDv(usuario.getRun()));
+                usuario.setNombre(faker.name().firstName());
+                usuario.setAPaterno(faker.name().lastName());
+                usuario.setAMaterno(faker.name().lastName());
+                usuario.setFechaRegistro(Date.from(faker.timeAndDate().past(5, java.util.concurrent.TimeUnit.DAYS)));
+                usuario.setTelefono(crearTelefonoUnico());
+                usuario.setCorreo(crearCorreoUnico());
+                usuario.setContrasenia("password123");
+                usuario.setIntentosFallidos(0);
+                usuario.setRazonBaneo(null);
+                usuario.setDiasBaneo(null);
+                usuario.setTipoUsuario(tipo);
+                usuario.setEstado(estados.get(faker.random().nextInt(estados.size())));
             }
         }
     }
 
-    // Método para generar un Usuario base con datos aleatorios únicos
-    private Usuario crearUsuarioBase() {
-        Usuario usuario = new Usuario();
-
-        // Asegurar RUN único
+    // Métodos de utilidad para crear datos únicos
+    private String crearRunUnico() {
         String run;
         do {
             run = faker.number().digits(8);
-        } while (uniqueRuns.contains(run));
-        uniqueRuns.add(run);
-        usuario.setRun(run);
+        } while (!uniqueRuns.add(run)); // Usa 'add' para evitar duplicados y verificar al mismo tiempo
+        return run;
+    }
 
-        // Asegurar Teléfono único
+    private String crearTelefonoUnico() {
         String telefono;
         do {
             telefono = "9" + faker.number().digits(8);
-        } while (uniqueTelefonos.contains(telefono));
-        uniqueTelefonos.add(telefono);
-        usuario.setTelefono(telefono);
+        } while (!uniqueTelefonos.add(telefono));
+        return telefono;
+    }
 
-        // Asegurar Correo único
+    private String crearCorreoUnico() {
         String correo;
         do {
             correo = faker.internet().emailAddress();
-        } while (uniqueCorreos.contains(correo));
-        uniqueCorreos.add(correo);
-        usuario.setCorreo(correo);
-
-        usuario.setDv(calcularDv(usuario.getRun()));
-        usuario.setNombre(faker.name().firstName());
-        usuario.setAPaterno(faker.name().lastName());
-        usuario.setAMaterno(faker.name().lastName());
-        usuario.setFechaRegistro(faker.date().past(5, java.util.concurrent.TimeUnit.DAYS));
-        usuario.setContrasenia("password123");
-        usuario.setIntentosFallidos(0);
-        usuario.setRazonBaneo(null);
-        usuario.setDiasBaneo(null);
-
-        return usuario;
+        } while (!uniqueCorreos.add(correo));
+        return correo;
     }
 
     // Método para obtener datos de APIs externas
@@ -199,15 +171,16 @@ public class DataLoader implements CommandLineRunner {
         try {
             return client.get()
                     .uri(uri)
-
                     .retrieve()
                     .bodyToFlux(clazz)
                     .collectList()
                     .toFuture()
                     .get();
+        } catch (WebClientResponseException e) {
+            System.err.println("Error en la respuesta de la API para " + uri + ": " + e.getStatusCode() + " - " + e.getResponseBodyAsString());
+            return Collections.emptyList();
         } catch (InterruptedException | ExecutionException e) {
-            System.err.println("Error al obtener datos de la API: " + uri);
-            e.printStackTrace();
+            System.err.println("Error de conexión o inesperado al obtener datos de la API: " + uri + " - " + e.getMessage());
             return Collections.emptyList();
         }
     }

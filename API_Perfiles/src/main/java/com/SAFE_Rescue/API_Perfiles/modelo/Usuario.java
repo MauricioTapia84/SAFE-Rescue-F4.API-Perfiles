@@ -149,9 +149,15 @@ public class Usuario {
     private Estado estado;
 
 
-    @Column(name = "foto_url", length = 255, nullable = true)
-    @Schema(description = "URL de la foto del usuario", example = "http://api-fotos.com/fotos/user123.jpg")
-    private String fotoUrl;
+    /**
+     * Foto de perfil del usuario.
+     * Relación Muchos-a-uno con la entidad Foto.
+     * optimiza el rendimiento al no cargar la foto hasta que sea necesaria.
+     */
+    @ManyToOne
+    @JoinColumn(name = "id_foto", referencedColumnName = "id_foto", nullable = true)
+    @Schema(description = "Foto de perfil del usuario")
+    private Foto foto;
 
     /**
      * Tipo usuario.
