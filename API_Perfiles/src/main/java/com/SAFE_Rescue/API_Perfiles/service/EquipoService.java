@@ -1,8 +1,6 @@
 package com.SAFE_Rescue.API_Perfiles.service;
 
-import com.SAFE_Rescue.API_Perfiles.modelo.Compania;
 import com.SAFE_Rescue.API_Perfiles.modelo.Equipo;
-import com.SAFE_Rescue.API_Perfiles.modelo.TipoEquipo;
 import com.SAFE_Rescue.API_Perfiles.repositoy.EquipoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -12,7 +10,6 @@ import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.concurrent.ExecutionException;
 
 @Service
 public class EquipoService {
@@ -80,10 +77,9 @@ public class EquipoService {
     }
 
     public void delete(Integer id) {
-        if (!equipoRepository.existsById(id)) {
-            throw new NoSuchElementException("Equipo no encontrado con ID: " + id);
-        }
-        equipoRepository.deleteById(id);
+        Equipo equipo = equipoRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Equipo no encontrado con ID: " + id));
+        equipoRepository.delete(equipo);
     }
 
     private void validarAtributosEquipo(Equipo equipo) {
@@ -108,19 +104,22 @@ public class EquipoService {
     // Método para validar la existencia de la compañía en la API externa
     private void validarCompaniaExterna(Equipo equipo) {
         if (equipo.getCompania() != null) {
-            Mono<Compania> companiaMono = companiaWebClient.get()
-                    .uri("/{id}", equipo.getCompania().getIdCompania())
-                    .retrieve()
-                    .onStatus(status -> status.is4xxClientError(),
-                            response -> Mono.error(new IllegalArgumentException("La compañía asociada al equipo no existe en la API externa.")))
-                    .bodyToMono(Compania.class);
-
             try {
-                // Bloquea la llamada para obtener el resultado
-                companiaMono.toFuture().get();
-            } catch (InterruptedException | ExecutionException e) {
+                // Se realiza la llamada a la API externa
+                this.companiaWebClient.get()
+                        .uri("/{id}", equipo.getCompania().getIdCompania())
+                        .retrieve()
+                        // Si el estado es un error 4xx, lanza una excepción
+                        .onStatus(status -> status.is4xxClientError(),
+                                response -> Mono.error(new IllegalArgumentException("La compañía asociada al equipo no existe en la API externa.")))
+                        // bodyToMono(String.class) consume el cuerpo y el .block() espera a que llegue la respuesta
+                        .bodyToMono(String.class)
+                        .block(); // <-- Aquí se bloquea el hilo de ejecución
+            } catch (Exception e) {
+                // Captura la excepción lanzada por onStatus o cualquier otro error de comunicación
                 throw new IllegalArgumentException("Error al comunicarse con la API de compañías.", e);
             }
         }
     }
+
 }

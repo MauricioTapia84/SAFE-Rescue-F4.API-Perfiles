@@ -1,7 +1,6 @@
 package com.SAFE_Rescue.API_Perfiles.service;
 
 import com.SAFE_Rescue.API_Perfiles.modelo.Bombero;
-import com.SAFE_Rescue.API_Perfiles.modelo.Equipo;
 import com.SAFE_Rescue.API_Perfiles.repositoy.BomberoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -28,6 +27,7 @@ public class BomberoService {
 
     /**
      * Obtiene todos los bomberos registrados.
+     *
      * @return Una lista de todos los bomberos.
      */
     public List<Bombero> findAll() {
@@ -36,6 +36,7 @@ public class BomberoService {
 
     /**
      * Busca un bombero por su ID único.
+     *
      * @param id El ID del bombero.
      * @return El bombero encontrado.
      * @throws NoSuchElementException Si el bombero no es encontrado.
@@ -47,6 +48,7 @@ public class BomberoService {
 
     /**
      * Guarda un nuevo bombero.
+     *
      * @param bombero El objeto Bombero a guardar.
      * @return El bombero guardado.
      * @throws IllegalArgumentException Si los datos del bombero son inválidos.
@@ -71,11 +73,12 @@ public class BomberoService {
 
     /**
      * Actualiza un bombero existente.
+     *
      * @param bombero El objeto Bombero con los datos actualizados.
-     * @param id El ID del bombero a actualizar.
+     * @param id      El ID del bombero a actualizar.
      * @return El bombero actualizado.
      * @throws IllegalArgumentException Si los datos del bombero son inválidos.
-     * @throws NoSuchElementException Si el bombero no es encontrado.
+     * @throws NoSuchElementException   Si el bombero no es encontrado.
      */
     public Bombero update(Bombero bombero, Integer id) {
         if (bombero == null) {
@@ -115,6 +118,7 @@ public class BomberoService {
 
     /**
      * Elimina un bombero por su ID.
+     *
      * @param id El ID del bombero a eliminar.
      * @throws NoSuchElementException Si el bombero no es encontrado.
      */
@@ -127,6 +131,7 @@ public class BomberoService {
 
     /**
      * Valida las relaciones específicas de Bombero, como la existencia de un equipo.
+     *
      * @param bombero El objeto Bombero a validar.
      * @throws IllegalArgumentException Si el equipo no existe.
      */

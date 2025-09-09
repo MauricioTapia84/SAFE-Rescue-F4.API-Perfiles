@@ -1,11 +1,11 @@
 package com.SAFE_Rescue.API_Perfiles.modelo;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * Entidad que representa una Compañía de bomberos.
@@ -23,7 +23,7 @@ public class Compania {
      * Se genera automáticamente mediante estrategia de identidad.
      */
     @Id
-    @Column(name="id_compania")
+    @Column(name = "id_compania")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Schema(description = "Identificador único de la compañía", example = "1")
     private int idCompania;

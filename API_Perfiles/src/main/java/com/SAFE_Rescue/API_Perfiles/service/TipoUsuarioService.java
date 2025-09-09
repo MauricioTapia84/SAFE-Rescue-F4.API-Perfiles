@@ -18,12 +18,14 @@ import java.util.NoSuchElementException;
 public class TipoUsuarioService {
 
     // REPOSITORIOS INYECTADOS
-    @Autowired private TipoUsuarioRepository tipoUsuarioRepository;
+    @Autowired
+    private TipoUsuarioRepository tipoUsuarioRepository;
 
     // MÉTODOS CRUD PRINCIPALES
 
     /**
      * Obtiene todos los tipos de usuario registrados en el sistema.
+     *
      * @return Lista completa de tipos de usuario
      */
     public List<TipoUsuario> findAll() {
@@ -32,11 +34,12 @@ public class TipoUsuarioService {
 
     /**
      * Busca un tipo de usuario por su ID único.
+     *
      * @param id Identificador del tipo de usuario
      * @return tipo de usuario encontrado
      * @throws NoSuchElementException Si no se encuentra el tipo de usuario
      */
-    public TipoUsuario findById(Integer id){
+    public TipoUsuario findById(Integer id) {
         return tipoUsuarioRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("No se encontró el tipo de usuario con ID: " + id));
     }
@@ -44,6 +47,7 @@ public class TipoUsuarioService {
     /**
      * Guarda un nuevo tipo de usuario en el sistema.
      * Realiza validaciones y guarda relaciones con otros componentes.
+     *
      * @param tipoUsuario Datos del tipo de usuario a guardar
      * @return tipo de usuario guardado con ID generado
      * @throws IllegalArgumentException Si el tipo de usuario no cumple con los parámetros
@@ -59,11 +63,12 @@ public class TipoUsuarioService {
 
     /**
      * Actualiza los datos de un tipo de usuario existente.
+     *
      * @param tipoUsuario Datos actualizados del tipo de usuario
-     * @param id Identificador del tipo de usuario a actualizar
+     * @param id          Identificador del tipo de usuario a actualizar
      * @return tipo de usuario actualizado
      * @throws IllegalArgumentException Si el tipo de usuario es nulo o si el nombre no cumple con los parámetros
-     * @throws NoSuchElementException Si no se encuentra el tipo de usuario a actualizar
+     * @throws NoSuchElementException   Si no se encuentra el tipo de usuario a actualizar
      */
     public TipoUsuario update(TipoUsuario tipoUsuario, Integer id) {
         if (tipoUsuario == null) {
@@ -87,10 +92,11 @@ public class TipoUsuarioService {
 
     /**
      * Elimina un tipo de usuario del sistema.
+     *
      * @param id Identificador del tipo de usuario a eliminar
      * @throws NoSuchElementException Si no se encuentra el tipo de usuario
      */
-    public void delete(Integer id){
+    public void delete(Integer id) {
         if (!tipoUsuarioRepository.existsById(id)) {
             throw new NoSuchElementException("Tipo de usuario no encontrado");
         }
@@ -101,6 +107,7 @@ public class TipoUsuarioService {
 
     /**
      * Valida el tipo de usuario.
+     *
      * @param tipoUsuario tipo de usuario
      * @throws IllegalArgumentException Si el tipo de usuario no cumple con las reglas de validación
      */

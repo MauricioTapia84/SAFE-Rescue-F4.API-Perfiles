@@ -8,11 +8,9 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
 
 import java.util.*;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Clase encargada de cargar datos iniciales en la base de datos para el perfil de desarrollo.
@@ -23,13 +21,20 @@ import java.util.concurrent.ThreadLocalRandom;
 @Component
 public class DataLoader implements CommandLineRunner {
 
-    @Autowired private UsuarioRepository usuarioRepository;
-    @Autowired private BomberoRepository bomberoRepository;
-    @Autowired private TipoUsuarioRepository tipoUsuarioRepository;
-    @Autowired private TipoEquipoRepository tipoEquipoRepository;
-    @Autowired private EquipoRepository equipoRepository;
-    @Autowired private WebClient estadoWebClient;
-    @Autowired private WebClient companiaWebClient;
+    @Autowired
+    private UsuarioRepository usuarioRepository;
+    @Autowired
+    private BomberoRepository bomberoRepository;
+    @Autowired
+    private TipoUsuarioRepository tipoUsuarioRepository;
+    @Autowired
+    private TipoEquipoRepository tipoEquipoRepository;
+    @Autowired
+    private EquipoRepository equipoRepository;
+    @Autowired
+    private WebClient estadoWebClient;
+    @Autowired
+    private WebClient companiaWebClient;
 
     private final Faker faker = new Faker(new Locale("es"));
     private final Set<String> uniqueRuns = new HashSet<>();

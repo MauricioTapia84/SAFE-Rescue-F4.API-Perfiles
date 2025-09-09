@@ -17,12 +17,14 @@ import java.util.NoSuchElementException;
 public class TipoEquipoService {
 
     // REPOSITORIOS INYECTADOS
-    @Autowired private TipoEquipoRepository tipoEquipoRepository;
+    @Autowired
+    private TipoEquipoRepository tipoEquipoRepository;
 
     // MÉTODOS CRUD PRINCIPALES
 
     /**
      * Obtiene todos los tipos de equipo registrados en el sistema.
+     *
      * @return Lista completa de tipos de equipo
      */
     public List<TipoEquipo> findAll() {
@@ -31,17 +33,19 @@ public class TipoEquipoService {
 
     /**
      * Busca un tipo de equipo por su ID único.
+     *
      * @param id Identificador del tipo de equipo
      * @return tipo de equipo encontrado
      * @throws NoSuchElementException Si no se encuentra el tipo de equipo
      */
-    public TipoEquipo findById(Integer id){
+    public TipoEquipo findById(Integer id) {
         return tipoEquipoRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("No se encontró el tipo de equipo con ID: " + id));
     }
 
     /**
      * Guarda un nuevo tipo de equipo en el sistema.
+     *
      * @param tipoEquipo Datos del tipo de equipo a guardar
      * @return tipo de equipo guardado con ID generado
      * @throws IllegalArgumentException Si el tipo de equipo no cumple con los parámetros
@@ -57,11 +61,12 @@ public class TipoEquipoService {
 
     /**
      * Actualiza los datos de un tipo de equipo existente.
+     *
      * @param tipoEquipo Datos actualizados del tipo de equipo
-     * @param id Identificador del tipo de equipo a actualizar
+     * @param id         Identificador del tipo de equipo a actualizar
      * @return tipo de equipo actualizado
      * @throws IllegalArgumentException Si el tipo de equipo es nulo o si el nombre no cumple con los parámetros
-     * @throws NoSuchElementException Si no se encuentra el tipo de equipo a actualizar
+     * @throws NoSuchElementException   Si no se encuentra el tipo de equipo a actualizar
      */
     public TipoEquipo update(TipoEquipo tipoEquipo, Integer id) {
         if (tipoEquipo == null) {
@@ -84,10 +89,11 @@ public class TipoEquipoService {
 
     /**
      * Elimina un tipo de equipo del sistema.
+     *
      * @param id Identificador del tipo de equipo a eliminar
      * @throws NoSuchElementException Si no se encuentra el tipo de equipo
      */
-    public void delete(Integer id){
+    public void delete(Integer id) {
         if (!tipoEquipoRepository.existsById(id)) {
             throw new NoSuchElementException("Tipo de equipo no encontrado");
         }
@@ -98,6 +104,7 @@ public class TipoEquipoService {
 
     /**
      * Valida el tipo de equipo.
+     *
      * @param tipoEquipo tipo de equipo
      * @throws IllegalArgumentException Si el tipo de equipo no cumple con las reglas de validación
      */

@@ -8,6 +8,7 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 import java.util.Date;
 
 /**
@@ -117,7 +118,7 @@ public class Usuario {
      * Intentos fallidos del usuario al iniciar sesión.
      * Valor entero no negativo (>= 0).
      */
-    @Column(name="intentos_fallidos", nullable = false)
+    @Column(name = "intentos_fallidos", nullable = false)
     @Schema(description = "Número de intentos fallidos de inicio de sesión", example = "0")
     private int intentosFallidos = 0;
 
@@ -125,7 +126,7 @@ public class Usuario {
      * Razón de baneo.
      * Puede ser un valor nulo y con una longitud máxima de 100 caracteres.
      */
-    @Column(name="razon_baneo", length = 100, nullable = true)
+    @Column(name = "razon_baneo", length = 100, nullable = true)
     @Schema(description = "Razón de baneo del usuario", example = "Spam")
     @Size(max = 100)
     private String razonBaneo;
@@ -134,7 +135,7 @@ public class Usuario {
      * Días de baneo.
      * Puede ser un valor nulo y valor entero no negativo (>= 0).
      */
-    @Column(name="dias_baneo", nullable = true)
+    @Column(name = "dias_baneo", nullable = true)
     @Schema(description = "Número de días de baneo", example = "0")
     private Integer diasBaneo;
 
@@ -146,6 +147,11 @@ public class Usuario {
     @JoinColumn(name = "estado_id", referencedColumnName = "id_estado")
     @Schema(description = "Estado del usuario")
     private Estado estado;
+
+
+    @Column(name = "foto_url", length = 255, nullable = true)
+    @Schema(description = "URL de la foto del usuario", example = "http://api-fotos.com/fotos/user123.jpg")
+    private String fotoUrl;
 
     /**
      * Tipo usuario.
