@@ -1,15 +1,15 @@
 package com.SAFE_Rescue.API_Perfiles.modelo;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import io.swagger.v3.oas.annotations.media.Schema;
-import java.util.List;
 
 /**
- * Entidad que representa un equipo de bomberos en el sistema.
- * Contiene información sobre la composición y estado del equipo.
+ * Entidad que representa un equipo en el sistema.
+ * Contiene información sobre la composición y el estado del equipo.
  */
 @Entity
 @Table(name = "equipo")
@@ -22,58 +22,34 @@ public class Equipo {
      * Identificador único del equipo.
      */
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // Auto-incremental
+    @Column(name = "id_equipo")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Schema(description = "Identificador único del equipo", example = "1")
-    private Integer id;
+    private int idEquipo;
 
     /**
      * Nombre del equipo (máximo 50 caracteres).
      */
     @Column(name = "nombre_equipo", length = 50, nullable = false)
-    @Schema(description = "Nombre del equipo", example = "Equipo A", required = true, maxLength = 50)
+    @Schema(description = "Nombre del equipo", example = "Equipo Alfa", required = true)
+    @Size(max = 50)
     private String nombre;
 
     /**
-     * Cantidad de miembros en el equipo (hasta 99).
+     * Líder del equipo.
+     * Relación uno-a-uno con la entidad Usuario.
      */
-    @Column(name = "cantidad_miembros", length = 2, nullable = true)
-    @Schema(description = "Cantidad de miembros en el equipo", example = "5", minimum = "0", maximum = "99")
-    private Integer cantidadMiembros;
-
-    /**
-     * Estado actual del equipo (activo/inactivo).
-     */
-    @Column(nullable = false)
-    @Schema(description = "Estado del equipo", example = "true")
-    private boolean estado;
-
-    /**
-     * Nombre del líder del equipo (máximo 50 caracteres).
-     */
-    @Column(name = "nombre_lider", length = 50, nullable = true)
-    @Schema(description = "Nombre del líder del equipo", example = "Juan Pérez", maxLength = 50)
-    private String lider;
-
-
-    /**
-     * Lista de personal.
-     * Relación muchos-a-muchos con la entidad Bombero.
-     */
-    @ManyToMany
-    @JoinTable(
-            name = "equipo_personal",
-            joinColumns = @JoinColumn(name = "equipo_id"),
-            inverseJoinColumns = @JoinColumn(name = "personal_id")
-    )
-    @Schema(description = "Lista de bomberos asignados al equipo")
-    private List<Bombero> personal;
+    @OneToOne
+    @JoinColumn(name = "lider_id", referencedColumnName = "id_usuario", nullable = true)
+    @Schema(description = "Líder del equipo", example = "Usuario líder del equipo")
+    private Usuario lider;
 
     /**
      * Compañía a la que pertenece el equipo.
      * Relación muchos-a-uno con la entidad Compania.
      */
     @ManyToOne
-    @JoinColumn(name = "compania_id", referencedColumnName = "id")
+    @JoinColumn(name = "compania_id", referencedColumnName = "id_compania")
     @Schema(description = "Compañía a la que pertenece el equipo")
     private Compania compania;
 
@@ -82,8 +58,16 @@ public class Equipo {
      * Relación muchos-a-uno con la entidad TipoEquipo.
      */
     @ManyToOne
-    @JoinColumn(name = "tipo_equipo_id", referencedColumnName = "id")
+    @JoinColumn(name = "tipo_equipo_id", referencedColumnName = "id_tipo_equipo")
     @Schema(description = "Tipo de equipo asignado")
     private TipoEquipo tipoEquipo;
 
+    /**
+     * Estado equipo.
+     * Relación Muchos-a-uno con la entidad Estado equipo que pertenece a la API Configuraciones.
+     */
+    @ManyToOne
+    @JoinColumn(name = "estado_id", referencedColumnName = "id_estado")
+    @Schema(description = "Estado del equipo")
+    private Estado estado;
 }
