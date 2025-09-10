@@ -210,7 +210,7 @@ public class UsuarioService {
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado con ID: " + id));
 
-        usuario.setFotoUrl(fotoUrl);
+        usuario.getFoto().setUrl(fotoUrl);
         usuarioRepository.save(usuario);
 
         return fotoUrl;

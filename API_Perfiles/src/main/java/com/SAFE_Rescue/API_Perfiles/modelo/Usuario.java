@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 /**
@@ -84,7 +85,7 @@ public class Usuario {
     @Column(name = "fecha_registro", nullable = false)
     @Schema(description = "Fecha de registro del usuario", example = "2022-01-01", required = true)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ", timezone = "GMT-4")
-    private Date fechaRegistro;
+    private LocalDate fechaRegistro;
 
     /**
      * Teléfono disponible del usuario.

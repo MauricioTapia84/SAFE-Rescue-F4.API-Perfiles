@@ -23,7 +23,7 @@ import java.util.NoSuchElementException;
  * Proporciona endpoints para operaciones CRUD y gestión de relaciones de usuarios
  */
 @RestController
-@RequestMapping("/api-administrador/v1/usuarios")
+@RequestMapping("/api-perfiles/v1/usuarios")
 @Tag(name = "Usuarios", description = "Operaciones de CRUD relacionadas con Usuarios")
 public class UsuarioController {
 

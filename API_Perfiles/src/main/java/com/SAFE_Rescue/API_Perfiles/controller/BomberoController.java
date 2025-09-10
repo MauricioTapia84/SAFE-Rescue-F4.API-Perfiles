@@ -22,7 +22,7 @@ import java.util.NoSuchElementException;
  * Proporciona endpoints para operaciones CRUD y gestión de relaciones de bomberos
  */
 @RestController
-@RequestMapping("/api-administrador/v1/bomberos")
+@RequestMapping("/api-perfiles/v1/bomberos")
 @Tag(name = "Bomberos", description = "Operaciones de CRUD relacionadas con Bomberos")
 public class BomberoController {
 

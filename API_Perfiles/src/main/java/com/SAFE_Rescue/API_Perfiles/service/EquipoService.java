@@ -56,13 +56,14 @@ public class EquipoService {
             throw new IllegalArgumentException("El equipo a actualizar no puede ser nulo.");
         }
 
-        // Se validan los atributos y las relaciones
+        // Mover esta línea al principio para asegurar que la NoSuchElementException se lanza primero
+        Equipo equipoExistente = equipoRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Equipo no encontrado con ID: " + id));
+
+        // Ahora se validan los atributos y las relaciones SÓLO si el equipo existe
         validarAtributosEquipo(equipo);
         validarTipoEquipo(equipo);
         validarCompaniaExterna(equipo);
-
-        Equipo equipoExistente = equipoRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("Equipo no encontrado con ID: " + id));
 
         equipoExistente.setNombre(equipo.getNombre());
         equipoExistente.setCompania(equipo.getCompania());

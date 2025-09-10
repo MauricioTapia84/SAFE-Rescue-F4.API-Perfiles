@@ -22,7 +22,7 @@ import java.util.NoSuchElementException;
  * Proporciona endpoints para operaciones CRUD y gestión de relaciones de equipos
  */
 @RestController
-@RequestMapping("/api-administrador/v1/equipos")
+@RequestMapping("/api-perfiles/v1/equipos")
 @Tag(name = "Equipos", description = "Operaciones de CRUD relacionadas con Equipos")
 public class EquipoController {
 

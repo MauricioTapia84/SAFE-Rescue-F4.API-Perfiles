@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
+import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 
@@ -128,7 +129,7 @@ public class DataLoader implements CommandLineRunner {
                 usuario.setNombre(faker.name().firstName());
                 usuario.setAPaterno(faker.name().lastName());
                 usuario.setAMaterno(faker.name().lastName());
-                usuario.setFechaRegistro(Date.from(faker.timeAndDate().past(5, java.util.concurrent.TimeUnit.DAYS)));
+                usuario.setFechaRegistro(LocalDate.from(faker.timeAndDate().past(5, java.util.concurrent.TimeUnit.DAYS)));
                 usuario.setTelefono(crearTelefonoUnico());
                 usuario.setCorreo(crearCorreoUnico());
                 usuario.setContrasenia("password123");
